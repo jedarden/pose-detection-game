@@ -1,39 +1,52 @@
-// ***********************************************************
-// This example support/e2e.ts is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
-// ***********************************************************
-
-// Import commands.js using ES2015 syntax:
+// E2E support file
 import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-// Hide XHR requests in command log
+// Mock MediaDevices API for E2E tests
 Cypress.on('window:before:load', (win) => {
-  // Stub console methods to avoid noise in tests
-  cy.stub(win.console, 'warn')
-  cy.stub(win.console, 'error')
-})
+  // Mock getUserMedia
+  Object.defineProperty(win.navigator, 'mediaDevices', {
+    writable: true,
+    value: {
+      getUserMedia: cy.stub().resolves({
+        getTracks: () => [
+          {
+            stop: cy.stub(),
+            kind: 'video',
+            enabled: true,
+            getSettings: () => ({
+              width: 640,
+              height: 480,
+              frameRate: 30,
+            }),
+          },
+        ],
+      }),
+      enumerateDevices: cy.stub().resolves([
+        {
+          deviceId: 'mock-camera-1',
+          kind: 'videoinput',
+          label: 'Mock Camera 1',
+        },
+        {
+          deviceId: 'mock-camera-2',
+          kind: 'videoinput',
+          label: 'Mock Camera 2',
+        },
+      ]),
+    },
+  })
 
-// Global test setup
-beforeEach(() => {
-  // Mock camera permissions
-  cy.window().then((win) => {
-    cy.stub(win.navigator.mediaDevices, 'getUserMedia').resolves({
-      getTracks: () => [],
-      getVideoTracks: () => [],
-      getAudioTracks: () => [],
-    })
+  // Mock performance API
+  Object.defineProperty(win, 'performance', {
+    writable: true,
+    value: {
+      ...win.performance,
+      mark: cy.stub(),
+      measure: cy.stub(),
+      getEntriesByName: cy.stub().returns([{ duration: 16.67 }]),
+    },
   })
 })

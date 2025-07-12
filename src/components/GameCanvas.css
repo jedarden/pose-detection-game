@@ -1,0 +1,185 @@
+.game-canvas-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.game-canvas {
+  border-radius: 8px;
+  border: 2px solid rgba(33, 150, 243, 0.3);
+  background: #000;
+  max-width: 100%;
+  height: auto;
+  cursor: crosshair;
+}
+
+.canvas-overlay {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.game-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  backdrop-filter: blur(10px);
+  min-width: 80px;
+}
+
+.stat-item.target {
+  border-color: rgba(255, 193, 7, 0.5);
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+}
+
+.target .stat-value {
+  color: #FFC107;
+}
+
+.pose-info {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.keypoint-count {
+  font-size: 0.8rem;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+/* Game state overlays */
+.game-canvas-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.game-canvas-container.game-over::after {
+  background: rgba(244, 67, 54, 0.1);
+  border: 2px solid rgba(244, 67, 54, 0.3);
+}
+
+.game-canvas-container.paused::after {
+  background: rgba(255, 193, 7, 0.1);
+  border: 2px solid rgba(255, 193, 7, 0.3);
+}
+
+.game-canvas-container.playing::after {
+  background: rgba(76, 175, 80, 0.05);
+  border: 2px solid rgba(76, 175, 80, 0.2);
+}
+
+/* Performance indicators */
+.performance-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.performance-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4CAF50;
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+
+.performance-dot.warning {
+  background: #FF9800;
+}
+
+.performance-dot.error {
+  background: #F44336;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .game-canvas-container {
+    padding: 0.5rem;
+  }
+  
+  .canvas-overlay {
+    top: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .game-stats {
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    padding: 0.4rem 0.6rem;
+    min-width: 60px;
+  }
+  
+  .stat-label {
+    font-size: 0.6rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem;
+  }
+  
+  .pose-info {
+    bottom: 0.5rem;
+    left: 0.5rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .keypoint-count {
+    font-size: 0.7rem;
+  }
+}
