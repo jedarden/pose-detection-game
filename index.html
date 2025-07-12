@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pose Game">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="./src/js/pose-detector.js" as="script">
+    <link rel="preload" href="./src/js/mobile-optimizer.js" as="script">
+    <link rel="preload" href="./src/css/mobile-styles.css" as="style">
+    
+    <title>Pose Detection Game - Mobile Optimized</title>
+    
+    <!-- Critical CSS inline for mobile performance -->
+    <style>
+        /* Critical path styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+    
+    <!-- Non-critical CSS -->
+    <link rel="stylesheet" href="./src/css/mobile-styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading">
+        <div>
+            <div class="spinner"></div>
+            <div>Loading Pose Detection...</div>
+            <div style="font-size: 0.9rem; margin-top: 8px; opacity: 0.8;">
+                Optimizing for your device...
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div id="game-container" class="hidden">
+        <!-- Video and Canvas Container -->
+        <div id="camera-container">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
+            <canvas id="pose-canvas"></canvas>
+        </div>
+
+        <!-- Game UI -->
+        <div id="game-ui">
+            <!-- Score and Status -->
+            <div id="status-bar">
+                <div id="score">Score: 0</div>
+                <div id="fps-counter">FPS: --</div>
+                <div id="battery-indicator"></div>
+            </div>
+
+            <!-- Touch Controls -->
+            <div id="touch-controls">
+                <button id="start-btn" class="control-btn">Start Game</button>
+                <button id="pause-btn" class="control-btn hidden">Pause</button>
+                <button id="settings-btn" class="control-btn">⚙️</button>
+            </div>
+
+            <!-- Game Instructions -->
+            <div id="instructions">
+                <h3>How to Play</h3>
+                <p>Mirror the poses shown on screen!</p>
+                <ul>
+                    <li>Stand where your full body is visible</li>
+                    <li>Match the target poses accurately</li>
+                    <li>Hold poses for points</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Settings</h3>
+                <div class="setting-group">
+                    <label>Quality:</label>
+                    <select id="quality-select">
+                        <option value="auto">Auto (Recommended)</option>
+                        <option value="high">High Quality</option>
+                        <option value="medium">Medium Quality</option>
+                        <option value="low">Low Quality</option>
+                        <option value="battery">Battery Saver</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Camera:</label>
+                    <select id="camera-select">
+                        <option value="user">Front Camera</option>
+                        <option value="environment">Back Camera</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="haptic-feedback"> 
+                        Haptic Feedback
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="audio-enabled" checked> 
+                        Audio
+                    </label>
+                </div>
+                <button id="close-settings">Close</button>
+            </div>
+        </div>
+
+        <!-- Performance Monitor (Debug) -->
+        <div id="performance-monitor" class="hidden">
+            <div id="performance-stats"></div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Device Not Supported</h3>
+            <p id="error-message">Your device may not support pose detection features.</p>
+            <button id="retry-btn">Retry</button>
+            <button id="fallback-btn">Alternative Mode</button>
+        </div>
+    </div>
+
+    <!-- Orientation Lock Notice -->
+    <div id="orientation-notice" class="modal hidden">
+        <div class="modal-content">
+            <h3>📱 Rotate Your Device</h3>
+            <p>For the best experience, please rotate your device to portrait mode.</p>
+        </div>
+    </div>
+
+    <!-- Scripts - Load in order for mobile performance -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
+    
+    <!-- Custom modules -->
+    <script type="module" src="./src/js/mobile-optimizer.js"></script>
+    <script type="module" src="./src/js/pose-detector.js"></script>
+    <script type="module" src="./src/js/touch-handler.js"></script>
+    <script type="module" src="./src/js/pwa-manager.js"></script>
+    <script type="module" src="./src/js/game-engine.js"></script>
+    <script type="module" src="./src/js/main.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW registered:', reg))
+                .catch(err => console.log('SW registration failed:', err));
+        }
+    </script>
+</body>
+</html>

@@ -7,38 +7,24 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '@': resolve(__dirname, './src'),
+      '@/components': resolve(__dirname, './src/components'),
+      '@/hooks': resolve(__dirname, './src/hooks'),
+      '@/utils': resolve(__dirname, './src/utils'),
+      '@/types': resolve(__dirname, './src/types'),
+      '@/game': resolve(__dirname, './src/game'),
     },
   },
   server: {
     port: 3000,
-    host: true, // Allow external connections
-    cors: true,
+    host: true,
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          tensorflow: ['@tensorflow/tfjs', '@tensorflow-models/pose-detection'],
-          phaser: ['phaser'],
-        },
-      },
-    },
   },
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@tensorflow/tfjs',
-      '@tensorflow-models/pose-detection',
-      'phaser',
-    ],
-  },
-  preview: {
-    port: 3000,
-    host: true,
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./tests/setup/vitest.setup.ts'],
   },
 })
