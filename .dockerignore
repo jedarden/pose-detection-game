@@ -1,0 +1,96 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+
+# Logs
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Runtime data
+tmp/
+temp/
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+README.md
+*.md
+
+# CI/CD
+.github/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Deployment scripts
+deploy.sh
+*.sh
+
+# Testing
+tests/
+test/
+*.test.js
+*.spec.js
+jest.config.js
+
+# Build tools
+webpack.config.js
+babel.config.js
+.babelrc
+
+# Linting
+.eslintrc*
+.eslintignore
+
+# Research and development files
+research/
+
+# Memory and cache files
+.swarm/
+memory/
+.claude/
+ruv-swarm*
+claude-flow*
+mcp.json
+
+# Temporary files
+*.tmp
+*.temp

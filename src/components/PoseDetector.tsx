@@ -1,14 +1,14 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import type { PoseDetectorProps, Pose } from '../types';
 import './PoseDetector.css';
 
-const PoseDetector: React.FC<PoseDetectorProps> = ({
+const PoseDetector = ({
   onPoseDetected,
   config,
   cameraSettings
-}) => {
+}: PoseDetectorProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const detectorRef = useRef<poseDetection.PoseDetector | null>(null);

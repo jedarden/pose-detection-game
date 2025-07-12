@@ -1,15 +1,7 @@
 {
   "name": "pose-detection-game",
-  "version": "1.0.0",
-  "description": "A rhythm-action game using pose detection with Phaser 3",
-  "main": "src/game/main.js",
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "test:coverage": "react-scripts test --coverage --watchAll=false"
-  },
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
     "@tensorflow/tfjs": "^4.10.0",
     "@tensorflow-models/pose-detection": "^2.1.0",
@@ -39,34 +31,17 @@
     "jest-environment-jsdom": "^30.0.4",
     "ts-jest": "^29.4.0"
   },
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-typescript"
-    ]
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "test:coverage": "react-scripts test --coverage --watchAll=false"
   },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "preset": "ts-jest",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest",
-      "^.+\\.(js|jsx)$": "babel-jest"
-    },
-    "testMatch": [
-      "**/__tests__/**/*.(ts|tsx|js)",
-      "**/*.(test|spec).(ts|tsx|js)"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
-    },
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/setupTests.ts"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
     ]
   },
   "browserslist": {

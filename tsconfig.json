@@ -36,14 +36,19 @@
     "types": ["jest", "@testing-library/jest-dom", "node"]
   },
   "include": [
-    "src",
-    "tests",
-    "cypress"
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "coverage"
+    "dist", 
+    "coverage",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "tests",
+    "cypress"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

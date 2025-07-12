@@ -1,12 +1,12 @@
-import React from 'react';
+// No React import needed in React 18 JSX transform
 import type { DiagnosticsOverlayProps } from '../types';
 import './DiagnosticsOverlay.css';
 
-const DiagnosticsOverlay: React.FC<DiagnosticsOverlayProps> = ({
+const DiagnosticsOverlay = ({
   data,
   isVisible,
   onToggle
-}) => {
+}: DiagnosticsOverlayProps) => {
   if (!isVisible) return null;
 
   const getPerformanceStatus = () => {

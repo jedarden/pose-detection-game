@@ -1,5 +1,10 @@
-import React, { useRef, useEffect } from 'react'
-import type { CameraDevice } from '@/types'
+import { useRef, useEffect } from 'react'
+// CameraDevice type not defined, using local interface
+
+interface CameraDevice {
+  deviceId: string;
+  label: string;
+}
 
 interface CameraPreviewProps {
   stream: MediaStream | null
@@ -32,7 +37,7 @@ export function CameraPreview({
     }
   }, [stream])
 
-  const handleDeviceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleDeviceChange = (event: { target: { value: string } }) => {
     onDeviceChange(event.target.value)
   }
 

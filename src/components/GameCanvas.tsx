@@ -1,13 +1,13 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import type { GameCanvasProps, Pose, Keypoint } from '../types';
 import './GameCanvas.css';
 
-const GameCanvas: React.FC<GameCanvasProps> = ({
+const GameCanvas = ({
   pose,
   gameState,
   width,
   height
-}) => {
+}: GameCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Pose connections for skeleton drawing

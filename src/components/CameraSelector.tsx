@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { CameraSelectorProps } from '../types';
 import './CameraSelector.css';
 
-const CameraSelector: React.FC<CameraSelectorProps> = ({
+const CameraSelector = ({
   devices,
   selectedDeviceId,
   onDeviceSelect
-}) => {
+}: CameraSelectorProps) => {
   const [permissionStatus, setPermissionStatus] = useState<'granted' | 'denied' | 'pending'>('pending');
   const [isLoading, setIsLoading] = useState(true);
 
