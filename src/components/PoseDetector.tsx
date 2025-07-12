@@ -103,6 +103,11 @@ const PoseDetector = ({
       
       const detectionTime = performance.now() - startTime;
 
+      // Report detection time for diagnostics
+      if (detectionTime > 100) {
+        console.warn(`Slow pose detection: ${detectionTime.toFixed(1)}ms`);
+      }
+
       // Convert to our pose format and filter by confidence
       const detectedPose: Pose | null = poses.length > 0 ? {
         keypoints: poses[0].keypoints.map(kp => ({
@@ -128,9 +133,7 @@ const PoseDetector = ({
       }
 
       // Report detection time for diagnostics
-      if (onPoseDetected) {
-        // Could add callback for diagnostics here
-      }
+      // Could add callback for diagnostics here if needed
 
     } catch (err) {
       console.error('Pose detection error:', err);

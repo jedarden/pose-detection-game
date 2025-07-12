@@ -1,60 +1,100 @@
-// Core type definitions for the pose detection game
-
-export interface PosePoint {
-  x: number
-  y: number
-  z: number
-  visibility: number
+// Core game types
+export interface Pose {
+  keypoints: Keypoint[];
+  score?: number;
 }
 
-export interface PoseResults {
-  poseLandmarks: PosePoint[]
-  poseWorldLandmarks: PosePoint[]
-  segmentationMask: ImageData | null
+export interface Keypoint {
+  x: number;
+  y: number;
+  z?: number;
+  score?: number;
+  name?: string;
 }
 
 export interface GameState {
-  score: number
-  level: number
-  isPlaying: boolean
-  timeRemaining: number
-  currentChallenge: Challenge | null
+  isPlaying: boolean;
+  score: number;
+  level: number;
+  currentPose?: Pose;
+  targetPose?: string;
+  timeRemaining: number;
+  isGameOver: boolean;
 }
 
-export interface Challenge {
-  id: string
-  name: string
-  description: string
-  targetPose: PosePoint[]
-  duration: number
-  points: number
-  difficulty: 'easy' | 'medium' | 'hard'
+export interface CameraSettings {
+  deviceId: string;
+  facingMode: 'user' | 'environment';
+  width: number;
+  height: number;
 }
 
-export interface CameraDevice {
-  deviceId: string
-  kind: string
-  label: string
+export interface DetectionConfig {
+  modelType: 'MoveNet' | 'BlazePose';
+  enableSmoothing: boolean;
+  minDetectionConfidence: number;
+  minTrackingConfidence: number;
 }
 
-export interface PerformanceMetrics {
-  fps: number
-  processingTime: number
-  memoryUsage: number
-  accuracy: number
+export interface DiagnosticsData {
+  fps: number;
+  detectionTime: number;
+  memoryUsage: number;
+  modelLoaded: boolean;
+  cameraActive: boolean;
+  errors: string[];
 }
 
-export interface PoseDetectionConfig {
-  modelComplexity: number
-  enableSegmentation: boolean
-  smoothLandmarks: boolean
-  minDetectionConfidence: number
-  minTrackingConfidence: number
+// Store types
+export interface AppStore {
+  // Game state
+  gameState: GameState;
+  startGame: () => void;
+  pauseGame: () => void;
+  endGame: () => void;
+  updateScore: (points: number) => void;
+  
+  // Camera state
+  cameraSettings: CameraSettings;
+  availableDevices: MediaDeviceInfo[];
+  setCameraDevice: (deviceId: string) => void;
+  updateCameraSettings: (settings: Partial<CameraSettings>) => void;
+  
+  // Detection state
+  detectionConfig: DetectionConfig;
+  currentPose: Pose | null;
+  updateDetectionConfig: (config: Partial<DetectionConfig>) => void;
+  setPose: (pose: Pose | null) => void;
+  
+  // Diagnostics
+  diagnostics: DiagnosticsData;
+  showDiagnostics: boolean;
+  toggleDiagnostics: () => void;
+  updateDiagnostics: (data: Partial<DiagnosticsData>) => void;
 }
 
-export interface GameSettings {
-  difficulty: 'easy' | 'medium' | 'hard'
-  gameMode: 'timed' | 'endless' | 'challenge'
-  soundEnabled: boolean
-  showDebugInfo: boolean
+// Component props types
+export interface CameraSelectorProps {
+  onDeviceSelect: (deviceId: string) => void;
+  selectedDeviceId?: string;
+  devices: MediaDeviceInfo[];
+}
+
+export interface PoseDetectorProps {
+  onPoseDetected: (pose: Pose | null) => void;
+  config: DetectionConfig;
+  cameraSettings: CameraSettings;
+}
+
+export interface GameCanvasProps {
+  pose: Pose | null;
+  gameState: GameState;
+  width: number;
+  height: number;
+}
+
+export interface DiagnosticsOverlayProps {
+  data: DiagnosticsData;
+  isVisible: boolean;
+  onToggle: () => void;
 }

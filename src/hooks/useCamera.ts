@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { CameraDevice } from '@/types'
+// Using MediaDeviceInfo instead of custom CameraDevice type
 
 interface UseCameraOptions {
   autoStart?: boolean
@@ -11,7 +11,7 @@ interface UseCameraReturn {
   stream: MediaStream | null
   isLoading: boolean
   error: string | null
-  availableDevices: CameraDevice[]
+  availableDevices: MediaDeviceInfo[]
   selectedDeviceId: string | null
   startCamera: (deviceId?: string) => Promise<void>
   stopCamera: () => void
@@ -29,7 +29,7 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [availableDevices, setAvailableDevices] = useState<CameraDevice[]>([])
+  const [availableDevices, setAvailableDevices] = useState<MediaDeviceInfo[]>([])
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(
     preferredDeviceId || null
   )
@@ -42,11 +42,6 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
       const devices = await navigator.mediaDevices.enumerateDevices()
       const videoDevices = devices
         .filter(device => device.kind === 'videoinput')
-        .map(device => ({
-          deviceId: device.deviceId,
-          kind: device.kind,
-          label: device.label || `Camera ${device.deviceId.slice(0, 8)}`,
-        }))
 
       setAvailableDevices(videoDevices)
 

@@ -34,7 +34,7 @@ const initialDiagnostics: DiagnosticsData = {
   errors: [],
 };
 
-export const useAppStore = create<AppStore>((set, get) => ({
+export const useAppStore = create<AppStore>((set) => ({
   // Game state
   gameState: initialGameState,
   
