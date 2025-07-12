@@ -23,6 +23,7 @@ const initialDetectionConfig: DetectionConfig = {
   enableSmoothing: true,
   minDetectionConfidence: 0.5,
   minTrackingConfidence: 0.5,
+  detectionMode: 'arms-only',
 };
 
 const initialDiagnostics: DiagnosticsData = {

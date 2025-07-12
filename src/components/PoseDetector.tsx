@@ -118,24 +118,44 @@ const PoseDetector = ({
           z: kp.z,
           score: kp.score,
           name: kp.name
-        })).filter(kp => (kp.score || 0) >= config.minTrackingConfidence),
+        })).filter(kp => {
+          // Filter by confidence
+          if ((kp.score || 0) < config.minTrackingConfidence) return false;
+          
+          // For arms-only mode, only keep arm keypoints
+          if (config.detectionMode === 'arms-only') {
+            const armKeypoints = ['left_shoulder', 'right_shoulder', 'left_elbow', 
+                                  'right_elbow', 'left_wrist', 'right_wrist'];
+            return kp.name && armKeypoints.includes(kp.name);
+          }
+          
+          return true;
+        }),
         score: poses[0].score
       } : null;
-
-      onPoseDetected(detectedPose);
 
       // Update FPS counter
       const counter = fpsCounterRef.current;
       counter.frames++;
       const now = Date.now();
+      let currentFps = fps;
       if (now - counter.lastTime >= 1000) {
-        setFps(Math.round((counter.frames * 1000) / (now - counter.lastTime)));
+        currentFps = Math.round((counter.frames * 1000) / (now - counter.lastTime));
+        setFps(currentFps);
         counter.frames = 0;
         counter.lastTime = now;
       }
 
-      // Report detection time for diagnostics
-      // Could add callback for diagnostics here if needed
+      // Calculate memory usage
+      const memoryUsage = (performance as any).memory ? 
+        Math.round((performance as any).memory.usedJSHeapSize / 1024 / 1024) : 0;
+
+      // Call with pose and diagnostics data
+      onPoseDetected(detectedPose, {
+        fps: currentFps,
+        detectionTime: Math.round(detectionTime),
+        memoryUsage: memoryUsage
+      });
 
     } catch (err) {
       console.error('Pose detection error:', err);

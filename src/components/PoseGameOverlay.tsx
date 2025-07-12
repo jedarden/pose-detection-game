@@ -27,6 +27,7 @@ interface PoseGameOverlayProps {
   isPlaying: boolean;
   onScoreUpdate: (score: number) => void;
   showDiagnostics: boolean;
+  detectionMode: 'full-body' | 'arms-only';
 }
 
 const PoseGameOverlay = ({ 
@@ -34,7 +35,8 @@ const PoseGameOverlay = ({
   pose, 
   isPlaying, 
   onScoreUpdate,
-  showDiagnostics 
+  showDiagnostics,
+  detectionMode 
 }: PoseGameOverlayProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameBlocks, setGameBlocks] = useState<GameBlock[]>([]);
@@ -44,15 +46,26 @@ const PoseGameOverlay = ({
   const [lastPose, setLastPose] = useState<Pose | null>(null);
 
   // Pose connections for skeleton drawing
-  const poseConnections = [
+  const armConnections = [
     ['left_shoulder', 'right_shoulder'],
     ['left_shoulder', 'left_elbow'], ['left_elbow', 'left_wrist'],
-    ['right_shoulder', 'right_elbow'], ['right_elbow', 'right_wrist'],
+    ['right_shoulder', 'right_elbow'], ['right_elbow', 'right_wrist']
+  ];
+  
+  const fullBodyConnections = [
+    ...armConnections,
     ['left_shoulder', 'left_hip'], ['right_shoulder', 'right_hip'],
     ['left_hip', 'right_hip'],
     ['left_hip', 'left_knee'], ['left_knee', 'left_ankle'],
     ['right_hip', 'right_knee'], ['right_knee', 'right_ankle']
   ];
+  
+  const poseConnections = detectionMode === 'arms-only' ? armConnections : fullBodyConnections;
+  
+  // Keypoints to track based on mode
+  const relevantKeypoints = detectionMode === 'arms-only' 
+    ? ['left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist']
+    : null; // null means all keypoints
 
   // Calculate limb velocity for swipe detection
   const calculateVelocity = useCallback((prev: Keypoint, current: Keypoint): number => {
@@ -288,6 +301,11 @@ const PoseGameOverlay = ({
       // Draw keypoints
       pose.keypoints.forEach(kp => {
         if ((kp.score || 0) > 0.3) {
+          // Filter keypoints based on detection mode
+          if (relevantKeypoints && kp.name && !relevantKeypoints.includes(kp.name)) {
+            return;
+          }
+          
           const radius = 6;
           
           // Special highlighting for wrists (game controllers)
@@ -380,7 +398,7 @@ const PoseGameOverlay = ({
         y += 12;
       });
     }
-  }, [pose, gameBlocks, score, combo, recentSwipes, showDiagnostics, videoRef]);
+  }, [pose, gameBlocks, score, combo, recentSwipes, showDiagnostics, videoRef, poseConnections, relevantKeypoints]);
 
   // Helper function to get direction arrow
   const getDirectionArrow = (direction: string): string => {

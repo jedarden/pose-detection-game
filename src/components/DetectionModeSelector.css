@@ -1,0 +1,95 @@
+.detection-mode-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.mode-label {
+  font-weight: 600;
+  color: white;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mode-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-width: 100px;
+}
+
+.mode-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mode-button.active {
+  background: rgba(0, 255, 65, 0.2);
+  border-color: #00ff41;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.mode-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.mode-text {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.1rem;
+}
+
+.mode-description {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  text-align: center;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .detection-mode-selector {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  
+  .mode-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .mode-button {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    text-align: left;
+  }
+  
+  .mode-icon {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+  }
+  
+  .mode-description {
+    display: none;
+  }
+}

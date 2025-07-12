@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAppStore } from './store';
 import CameraSelector from './components/CameraSelector';
+import DetectionModeSelector from './components/DetectionModeSelector';
 import PoseDetector from './components/PoseDetector';
 import PoseGameOverlay from './components/PoseGameOverlay';
 import DiagnosticsOverlay from './components/DiagnosticsOverlay';
@@ -14,6 +15,7 @@ function App() {
     availableDevices,
     setCameraDevice,
     detectionConfig,
+    updateDetectionConfig,
     currentPose,
     setPose,
     gameState,
@@ -52,14 +54,17 @@ function App() {
     getDevices();
   }, [setCameraDevice, updateDiagnostics, cameraSettings.deviceId]);
 
-  const handlePoseDetected = (pose: any) => {
+  const handlePoseDetected = (pose: any, diagnosticsData?: any) => {
     setPose(pose);
     
     // Update diagnostics with detection info
     if (pose) {
       updateDiagnostics({
         modelLoaded: true,
-        cameraActive: true
+        cameraActive: true,
+        fps: diagnosticsData?.fps || 0,
+        detectionTime: diagnosticsData?.detectionTime || 0,
+        memoryUsage: diagnosticsData?.memoryUsage || 0
       });
     }
   };
@@ -101,6 +106,11 @@ function App() {
                     onDeviceSelect={setCameraDevice}
                   />
                   
+                  <DetectionModeSelector
+                    mode={detectionConfig.detectionMode}
+                    onModeChange={(mode) => updateDetectionConfig({ detectionMode: mode })}
+                  />
+                  
                   <div className="game-controls">
                     <button 
                       className={`game-button ${gameState.isPlaying ? 'pause' : 'play'}`}
@@ -127,6 +137,7 @@ function App() {
                       isPlaying={gameState.isPlaying}
                       onScoreUpdate={updateScore}
                       showDiagnostics={showDiagnostics}
+                      detectionMode={detectionConfig.detectionMode}
                     />
                   </div>
                 </div>

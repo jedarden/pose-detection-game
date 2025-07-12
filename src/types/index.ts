@@ -34,6 +34,7 @@ export interface DetectionConfig {
   enableSmoothing: boolean;
   minDetectionConfidence: number;
   minTrackingConfidence: number;
+  detectionMode: 'full-body' | 'arms-only';
 }
 
 export interface DiagnosticsData {
@@ -81,7 +82,7 @@ export interface CameraSelectorProps {
 }
 
 export interface PoseDetectorProps {
-  onPoseDetected: (pose: Pose | null) => void;
+  onPoseDetected: (pose: Pose | null, diagnostics?: any) => void;
   config: DetectionConfig;
   cameraSettings: CameraSettings;
   videoRef?: React.RefObject<HTMLVideoElement>;
