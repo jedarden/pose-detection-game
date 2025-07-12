@@ -7,9 +7,11 @@ import './PoseDetector.css';
 const PoseDetector = ({
   onPoseDetected,
   config,
-  cameraSettings
+  cameraSettings,
+  videoRef: externalVideoRef
 }: PoseDetectorProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const internalVideoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = externalVideoRef || internalVideoRef;
   const streamRef = useRef<MediaStream | null>(null);
   const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
   const animationRef = useRef<number | null>(null);

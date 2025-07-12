@@ -84,6 +84,7 @@ export interface PoseDetectorProps {
   onPoseDetected: (pose: Pose | null) => void;
   config: DetectionConfig;
   cameraSettings: CameraSettings;
+  videoRef?: React.RefObject<HTMLVideoElement>;
 }
 
 export interface GameCanvasProps {

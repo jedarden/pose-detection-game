@@ -1,0 +1,134 @@
+.pose-game-overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pose-overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.game-ui-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.game-instructions {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #00ff41;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+}
+
+.game-instructions p {
+  margin: 5px 0;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Beat Saber inspired styling */
+.pose-game-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 0, 64, 0.1) 0%,
+    rgba(0, 128, 255, 0.1) 50%,
+    rgba(0, 255, 65, 0.1) 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Glow effects for enhanced visual appeal */
+.pose-overlay-canvas {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.3));
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .game-ui-overlay {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .game-instructions {
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .game-instructions p {
+    font-size: 12px;
+    margin: 3px 0;
+  }
+}
+
+/* Animation for score updates */
+@keyframes scorePopup {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.score-popup {
+  animation: scorePopup 0.3s ease-out;
+}
+
+/* Block hit effects */
+@keyframes blockHit {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.block-hit-effect {
+  animation: blockHit 0.3s ease-out forwards;
+}
+
+/* Combo effect */
+@keyframes comboGlow {
+  0% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.combo-active {
+  animation: comboGlow 0.5s ease-in-out infinite;
+}

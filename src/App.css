@@ -87,34 +87,40 @@
 }
 
 .game-area {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  min-height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 600px;
 }
 
-.video-container, .canvas-container {
+.camera-overlay-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
   padding: 1rem;
   backdrop-filter: blur(10px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid rgba(0, 255, 65, 0.3);
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+  overflow: hidden;
 }
 
-.video-container {
-  border: 2px solid rgba(76, 175, 80, 0.3);
+.camera-overlay-container .pose-detector {
+  width: 100%;
+  height: 100%;
 }
 
-.canvas-container {
-  border: 2px solid rgba(33, 150, 243, 0.3);
+.camera-overlay-container .video-feed {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  transform: scaleX(-1); /* Mirror camera for better UX */
 }
 
 @media (max-width: 768px) {
   .game-area {
-    grid-template-columns: 1fr;
+    min-height: 400px;
   }
   
   .control-panel {

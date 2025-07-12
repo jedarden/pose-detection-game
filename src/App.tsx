@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAppStore } from './store';
 import CameraSelector from './components/CameraSelector';
 import PoseDetector from './components/PoseDetector';
-import GameCanvas from './components/GameCanvas';
+import PoseGameOverlay from './components/PoseGameOverlay';
 import DiagnosticsOverlay from './components/DiagnosticsOverlay';
 import './App.css';
 
 function App() {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const {
     cameraSettings,
     availableDevices,
@@ -22,7 +23,8 @@ function App() {
     updateDiagnostics,
     startGame,
     pauseGame,
-    endGame
+    endGame,
+    updateScore
   } = useAppStore();
 
   // Get available camera devices on mount
@@ -111,20 +113,20 @@ function App() {
                 </div>
 
                 <div className="game-area">
-                  <div className="video-container">
+                  <div className="camera-overlay-container">
                     <PoseDetector
                       cameraSettings={cameraSettings}
                       config={detectionConfig}
                       onPoseDetected={handlePoseDetected}
+                      videoRef={videoRef}
                     />
-                  </div>
-                  
-                  <div className="canvas-container">
-                    <GameCanvas
+                    
+                    <PoseGameOverlay
+                      videoRef={videoRef}
                       pose={currentPose}
-                      gameState={gameState}
-                      width={640}
-                      height={480}
+                      isPlaying={gameState.isPlaying}
+                      onScoreUpdate={updateScore}
+                      showDiagnostics={showDiagnostics}
                     />
                   </div>
                 </div>
