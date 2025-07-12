@@ -110,3 +110,7 @@ claude-swarm.*
 ruv-swarm*
 mcp.json
 CLAUDE.md
+
+
+# Project-specific
+ignore/

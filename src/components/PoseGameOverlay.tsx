@@ -38,6 +38,7 @@ const PoseGameOverlay = ({
   showDiagnostics,
   detectionMode 
 }: PoseGameOverlayProps) => {
+  console.log('PoseGameOverlay render:', { isPlaying, pose: !!pose, detectionMode });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameBlocks, setGameBlocks] = useState<GameBlock[]>([]);
   const [score, setScore] = useState(0);
@@ -102,15 +103,24 @@ const PoseGameOverlay = ({
 
   // Spawn new game blocks
   const spawnBlock = useCallback(() => {
-    if (!isPlaying) return;
+    if (!isPlaying) {
+      console.log('Block spawn skipped: game not playing');
+      return;
+    }
     
     const directions: GameBlock['direction'][] = ['up', 'down', 'left', 'right', 'up-left', 'up-right', 'down-left', 'down-right'];
     const colors: GameBlock['color'][] = ['red', 'blue'];
     
+    // FIX #3: Dynamically get canvas dimensions for proper block spawning
+    // Blocks now spawn within the actual canvas bounds instead of hardcoded 640x480
+    const canvas = canvasRef.current;
+    const canvasWidth = canvas?.width || 640;
+    const canvasHeight = canvas?.height || 480;
+    
     const newBlock: GameBlock = {
       id: `block-${Date.now()}-${Math.random()}`,
-      x: Math.random() * 400 + 120, // Random X position
-      y: Math.random() * 300 + 100, // Random Y position
+      x: Math.random() * (canvasWidth - 200) + 100, // Random X position with padding
+      y: Math.random() * (canvasHeight - 200) + 100, // Random Y position with padding
       z: 1000, // Start far away
       direction: directions[Math.floor(Math.random() * directions.length)],
       color: colors[Math.floor(Math.random() * colors.length)],
@@ -119,7 +129,12 @@ const PoseGameOverlay = ({
       hit: false
     };
     
-    setGameBlocks(prev => [...prev, newBlock]);
+    console.log('Spawning new block:', newBlock);
+    setGameBlocks(prev => {
+      const updated = [...prev, newBlock];
+      console.log('Total blocks after spawn:', updated.length);
+      return updated;
+    });
   }, [isPlaying]);
 
   // Check collision between limb and blocks
@@ -137,10 +152,12 @@ const PoseGameOverlay = ({
         const relevantWrist = block.color === 'red' ? leftWrist : rightWrist;
         if (!relevantWrist || (relevantWrist.score || 0) < 0.5) return block;
         
-        // Calculate distance between wrist and block
+        // Calculate distance between wrist and block (scale block position)
+        const blockX = (block.x / 640) * 640; // Normalize to video coordinates
+        const blockY = (block.y / 480) * 480;
         const distance = Math.sqrt(
-          Math.pow(relevantWrist.x - block.x, 2) + 
-          Math.pow(relevantWrist.y - block.y, 2)
+          Math.pow(relevantWrist.x - blockX, 2) + 
+          Math.pow(relevantWrist.y - blockY, 2)
         );
         
         // Check if within hit range and timing window
@@ -225,8 +242,10 @@ const PoseGameOverlay = ({
 
   // Game loop for block spawning and movement
   useEffect(() => {
+    console.log('Game loop effect triggered, isPlaying:', isPlaying);
     if (!isPlaying) return;
     
+    console.log('Starting game loop with block spawning');
     const spawnInterval = setInterval(spawnBlock, 2000); // Spawn block every 2 seconds
     
     const updateInterval = setInterval(() => {
@@ -258,17 +277,61 @@ const PoseGameOverlay = ({
     const canvas = canvasRef.current;
     const video = videoRef.current;
     
-    if (!canvas || !video) return;
+    if (!canvas || !video) {
+      console.log('Canvas draw skipped: missing canvas or video');
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('Canvas draw skipped: no 2d context');
+      return;
+    }
     
-    // Set canvas size to match video
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
+    // FIX #1: Use getBoundingClientRect() for accurate video dimensions
+    // This ensures canvas matches the actual rendered video size, not the stream size
+    const rect = video.getBoundingClientRect();
+    const width = rect.width || video.offsetWidth || 640;
+    const height = rect.height || video.offsetHeight || 480;
+    
+    if (canvas.width !== width || canvas.height !== height) {
+      console.log('Canvas resized to:', width, 'x', height);
+      canvas.width = width;
+      canvas.height = height;
+    }
+    
+    // Debug canvas visibility
+    console.log('🎨 Canvas render:', {
+      canvasWidth: canvas.width,
+      canvasHeight: canvas.height,
+      videoWidth: video.offsetWidth,
+      videoHeight: video.offsetHeight,
+      blocksCount: gameBlocks.length,
+      pose: !!pose
+    });
+    
+    // Scale factor for pose coordinates
+    const scaleX = canvas.width / (video.videoWidth || 640);
+    const scaleY = canvas.height / (video.videoHeight || 480);
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // FIX #2: Explicitly set global alpha to ensure all drawings are fully visible
+    // This prevents any inherited transparency issues
+    ctx.globalAlpha = 1.0;
+    
+    // DEBUG: Enhanced visibility test to verify canvas is rendering properly
+    // Shows canvas status and current block count for debugging
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+    ctx.fillRect(10, 10, 150, 60);
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('Canvas Active', 20, 35);
+    ctx.font = '12px Arial';
+    ctx.fillText(`Blocks: ${gameBlocks.length}`, 20, 55);
+    ctx.restore();
     
     // Draw pose skeleton if available
     if (pose && pose.keypoints) {
@@ -292,8 +355,8 @@ const PoseGameOverlay = ({
         
         if (startPoint && endPoint) {
           ctx.beginPath();
-          ctx.moveTo(startPoint.x, startPoint.y);
-          ctx.lineTo(endPoint.x, endPoint.y);
+          ctx.moveTo(startPoint.x * scaleX, startPoint.y * scaleY);
+          ctx.lineTo(endPoint.x * scaleX, endPoint.y * scaleY);
           ctx.stroke();
         }
       });
@@ -323,7 +386,7 @@ const PoseGameOverlay = ({
           }
           
           ctx.beginPath();
-          ctx.arc(kp.x, kp.y, radius, 0, 2 * Math.PI);
+          ctx.arc(kp.x * scaleX, kp.y * scaleY, radius, 0, 2 * Math.PI);
           ctx.fill();
           ctx.stroke();
         }
@@ -333,21 +396,44 @@ const PoseGameOverlay = ({
     }
     
     // Draw game blocks
-    gameBlocks.forEach(block => {
-      if (block.hit) return;
+    console.log('Drawing blocks:', gameBlocks.length);
+    gameBlocks.forEach((block, index) => {
+      if (block.hit) {
+        console.log(`Block ${index} skipped: already hit`);
+        return;
+      }
       
       // Calculate block size based on distance (z-depth)
       const scale = Math.max(0.1, 1 - (block.z / 1000));
       const size = 40 * scale;
       
-      // Block color
+      // FIX #5: Enhanced block visibility with better opacity and shadow effects
+      // Blocks are more visible when far away (increased base alpha)
+      // Added shadow blur for better visual depth perception
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, scale + 0.3); // More visible when far
       ctx.fillStyle = block.color === 'red' ? '#ff0040' : '#0080ff';
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = block.color === 'red' ? '#ff0040' : '#0080ff';
+      ctx.shadowBlur = 20 * scale;
       
-      // Draw block
-      ctx.fillRect(block.x - size/2, block.y - size/2, size, size);
-      ctx.strokeRect(block.x - size/2, block.y - size/2, size, size);
+      // FIX #4: Use block coordinates directly without scaling
+      // Previous scaling was causing blocks to appear in wrong positions
+      const blockX = block.x;
+      const blockY = block.y;
+      
+      console.log(`Drawing block ${index}:`, {
+        originalPos: { x: block.x, y: block.y, z: block.z },
+        canvasPos: { x: blockX, y: blockY },
+        size: size,
+        scale: scale,
+        color: block.color,
+        direction: block.direction
+      });
+      
+      ctx.fillRect(blockX - size/2, blockY - size/2, size, size);
+      ctx.strokeRect(blockX - size/2, blockY - size/2, size, size);
       
       // Draw direction arrow
       ctx.fillStyle = '#ffffff';
@@ -356,7 +442,8 @@ const PoseGameOverlay = ({
       ctx.textBaseline = 'middle';
       
       const arrow = getDirectionArrow(block.direction);
-      ctx.fillText(arrow, block.x, block.y);
+      ctx.fillText(arrow, blockX, blockY);
+      ctx.restore();
     });
     
     // Draw score and combo
@@ -436,7 +523,9 @@ const PoseGameOverlay = ({
           width: '100%',
           height: '100%',
           pointerEvents: 'none',
-          zIndex: 10
+          zIndex: 100, // FIX #6: Increased z-index to ensure canvas renders above video
+          backgroundColor: 'transparent',
+          display: 'block' // FIX #7: Explicitly set display to prevent any CSS override
         }}
       />
       

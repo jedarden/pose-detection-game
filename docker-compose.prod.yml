@@ -54,23 +54,6 @@ services:
     networks:
       - pose-detection-network
 
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis-data:/data
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 128M
-        reservations:
-          cpus: '0.25'
-          memory: 64M
-    networks:
-      - pose-detection-network
-    command: redis-server --appendonly yes --maxmemory 64mb --maxmemory-policy allkeys-lru
-
   watchtower:
     image: containrrr/watchtower
     volumes:
@@ -81,6 +64,3 @@ services:
 networks:
   pose-detection-network:
     driver: bridge
-
-volumes:
-  redis-data:

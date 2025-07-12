@@ -95,6 +95,9 @@
   min-height: 600px;
 }
 
+/* FIX #10: Changed overflow from hidden to visible
+   The overflow: hidden was clipping the game canvas and preventing blocks from rendering
+   Now the canvas can properly overlay the video without being cut off */
 .camera-overlay-container {
   position: relative;
   width: 100%;
@@ -105,7 +108,7 @@
   backdrop-filter: blur(10px);
   border: 2px solid rgba(0, 255, 65, 0.3);
   box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
-  overflow: hidden;
+  overflow: visible; /* Changed from hidden to visible */
 }
 
 .camera-overlay-container .pose-detector {
