@@ -1,3 +1,0 @@
-[submodule "tools/youtube-transcript-api"]
-	path = tools/youtube-transcript-api
-	url = https://github.com/jdepoix/youtube-transcript-api
