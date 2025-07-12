@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  pose-detection-game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-3000}
+      - LOG_LEVEL=info
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-3000}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - pose-detection-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - pose-detection-game
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    networks:
+      - pose-detection-network
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    networks:
+      - pose-detection-network
+    command: redis-server --appendonly yes --maxmemory 64mb --maxmemory-policy allkeys-lru
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    restart: always
+
+networks:
+  pose-detection-network:
+    driver: bridge
+
+volumes:
+  redis-data:
